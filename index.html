@@ -3,315 +3,187 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Modern Animated Portfolio</title>
+    <title>Lassiweb - Portfolio</title>
     
-    <!-- Google Fonts: Inter (clean modern) + Poppins for headings -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     
-    <!-- Icons: Phosphor Icons (lightweight, modern) -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
-    <!-- GSAP for smooth animations -->
+    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     
     <style>
+        /* ---------- THEME VARIABLES ---------- */
         :root {
+            /* Dark (default) */
             --bg: #0a0a0a;
             --text: #e0e0e0;
             --accent: #00d4ff;
             --card-bg: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.08);
             --shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+            --tag-bg: rgba(0, 212, 255, 0.1);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        [data-theme="light"] {
+            /* Light */
+            --bg: #f5f5f5;
+            --text: #222222;
+            --accent: #0066ff;
+            --card-bg: rgba(0, 0, 0, 0.04);
+            --border: rgba(0, 0, 0, 0.1);
+            --shadow: 0 8px 32px rgba(0, 102, 255, 0.15);
+            --tag-bg: rgba(0, 102, 255, 0.1);
         }
-        
+
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Inter', sans-serif;
             line-height: 1.7;
-            overflow-x: hidden;
+            overflow-x:hidden;
+            transition: background 0.3s, color 0.3s;
         }
-        
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Header & Nav */
+        html { scroll-behavior: smooth; }
+
+        /* Header */
         header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(12px);
-            background: rgba(10, 10, 10, 0.7);
-            border-bottom: 1px solid var(--border);
-            transition: all 0.3s ease;
+            position:fixed; top:0; width:100%; z-index:1000;
+            padding:1.5rem 5%; display:flex; justify-content:space-between;
+            align-items:center; backdrop-filter:blur(12px);
+            background:rgba(10,10,10,.7); border-bottom:1px solid var(--border);
+            transition:all .3s ease;
         }
-        
+        [data-theme="light"] header { background:rgba(255,255,255,.7); }
+
         .logo {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00d4ff, #7b00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family:'Poppins',sans-serif; font-size:1.8rem; font-weight:700;
+            background:linear-gradient(135deg,var(--accent),#7b00ff);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text;
         }
-        
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-        
+
+        nav ul { display:flex; gap:2rem; list-style:none; }
         nav a {
-            color: var(--text);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            transition: color 0.3s ease;
+            color:var(--text); text-decoration:none; font-weight:500;
+            position:relative; transition:color .3s;
         }
-        
         nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            transition: width 0.3s ease;
+            content:''; position:absolute; bottom:-6px; left:0;
+            width:0; height:2px; background:var(--accent); transition:width .3s;
         }
-        
-        nav a:hover {
-            color: var(--accent);
+        nav a:hover { color:var(--accent); }
+        nav a:hover::after { width:100%; }
+
+        /* Theme toggle */
+        .theme-toggle {
+            background:none; border:none; cursor:pointer;
+            font-size:1.4rem; color:var(--text);
+            transition:transform .3s;
         }
-        
-        nav a:hover::after {
-            width: 100%;
-        }
-        
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 5%;
-            position: relative;
-            overflow: hidden;
-        }
-        
+        .theme-toggle:hover { transform:scale(1.15); }
+
+        /* Hero */
+        .hero { height:100vh; display:flex; flex-direction:column;
+                 justify-content:center; align-items:center; text-align:center;
+                 padding:0 5%; position:relative; overflow:hidden; }
         .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at 30% 70%, rgba(0, 212, 255, 0.15), transparent 50%),
-                        radial-gradient(circle at 70% 30%, rgba(123, 0, 255, 0.15), transparent 50%);
-            z-index: -1;
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 30% 70%,rgba(0,212,255,.15),transparent 50%),
+                       radial-gradient(circle at 70% 30%,rgba(123,0,255,.15),transparent 50%);
+            z-index:-1;
         }
-        
-        .hero h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(3rem, 8vw, 6rem);
-            margin-bottom: 1rem;
-            opacity: 0;
-            transform: translateY(30px);
+        [data-theme="light"] .hero::before {
+            background:radial-gradient(circle at 30% 70%,rgba(0,102,255,.08),transparent 50%),
+                       radial-gradient(circle at 70% 30%,rgba(123,0,255,.08),transparent 50%);
         }
-        
-        .hero p {
-            font-size: 1.3rem;
-            max-width: 600px;
-            margin-bottom: 2rem;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        
+
+        .hero h1 { font-family:'Poppins',sans-serif; font-size:clamp(3rem,8vw,6rem);
+                   margin-bottom:1rem; opacity:0; transform:translateY(30px); }
+        .hero p { font-size:1.3rem; max-width:600px; margin-bottom:2rem;
+                  opacity:0; transform:translateY(30px); }
         .cta {
-            padding: 1rem 2.5rem;
-            background: linear-gradient(135deg, var(--accent), #7b00ff);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(30px);
-            box-shadow: var(--shadow);
+            padding:1rem 2.5rem; background:linear-gradient(135deg,var(--accent),#7b00ff);
+            color:#fff; border:none; border-radius:50px; font-weight:600;
+            cursor:pointer; font-size:1.1rem; transition:all .3s;
+            opacity:0; transform:translateY(30px); box-shadow:var(--shadow);
         }
-        
-        .cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.3);
-        }
-        
-        /* Section */
-        section {
-            padding: 8rem 5%;
-        }
-        
+        .cta:hover { transform:translateY(-3px);
+                     box-shadow:0 12px 40px rgba(0,212,255,.3); }
+
+        /* Sections */
+        section { padding:8rem 5%; }
         .section-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 4rem;
-            background: linear-gradient(135deg, #00d4ff, #7b00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0;
-            transform: translateY(20px);
+            font-family:'Poppins',sans-serif; font-size:3rem; text-align:center;
+            margin-bottom:4rem; background:linear-gradient(135deg,var(--accent),#7b00ff);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; opacity:0; transform:translateY(20px);
         }
-        
-        /* Projects Grid */
+
+        /* Projects */
         .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
+            display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+            gap:2rem; max-width:1400px; margin:0 auto;
         }
-        
         .project-card {
-            background: var(--card-bg);
-            border-radius: 1.5rem;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: all 0.4s ease;
-            opacity: 0;
-            transform: translateY(50px);
-            backdrop-filter: blur(10px);
+            background:var(--card-bg); border-radius:1.5rem; overflow:hidden;
+            border:1px solid var(--border); transition:all .4s;
+            opacity:0; transform:translateY(50px); backdrop-filter:blur(10px);
         }
-        
         .project-card:hover {
-            transform: translateY(-12px);
-            box-shadow: var(--shadow);
-            border-color: var(--accent);
+            transform:translateY(-12px); box-shadow:var(--shadow);
+            border-color:var(--accent);
         }
-        
         .project-img {
-            height: 200px;
-            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-            position: relative;
-            overflow: hidden;
+            height:200px; background:linear-gradient(135deg,#1a1a1a,#2a2a2a);
+            position:relative; overflow:hidden;
         }
-        
+        [data-theme="light"] .project-img { background:linear-gradient(135deg,#e0e0e0,#f5f5f5); }
         .project-img::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 60px; height: 60px;
-            background: var(--accent);
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.4s ease;
-            opacity: 0.3;
+            content:''; position:absolute; inset:0;
+            background:var(--accent); border-radius:50%; opacity:.3;
+            transform:scale(0); transition:transform .4s;
         }
-        
-        .project-card:hover .project-img::before {
-            transform: translate(-50%, -50%) scale(8);
-        }
-        
-        .project-img i {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem;
-            color: rgba(255,255,255,0.1);
-        }
-        
-        .project-info {
-            padding: 1.8rem;
-        }
-        
-        .project-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.8rem;
-            color: white;
-        }
-        
-        .project-desc {
-            font-size: 0.95rem;
-            margin-bottom: 1.2rem;
-            color: #b0b0b0;
-        }
-        
-        .project-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.2rem;
-        }
-        
-        .tag {
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--accent);
-            padding: 0.3rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        
-        .project-links {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .project-links a {
-            color: var(--text);
-            font-size: 1.3rem;
-            transition: color 0.3s ease;
-        }
-        
-        .project-links a:hover {
-            color: var(--accent);
-        }
-        
+        .project-card:hover .project-img::before { transform:scale(8); }
+        .project-img i { position:absolute; top:50%; left:50%;
+                         transform:translate(-50%,-50%); font-size:3rem;
+                         color:rgba(255,255,255,.1); }
+        [data-theme="light"] .project-img i { color:rgba(0,0,0,.1); }
+
+        .project-info { padding:1.8rem; }
+        .project-title { font-family:'Poppins',sans-serif; font-size:1.5rem;
+                         margin-bottom:.8rem; color:#fff; }
+        [data-theme="light"] .project-title { color:#222; }
+        .project-desc { font-size:.95rem; margin-bottom:1.2rem; color:#b0b0b0; }
+        [data-theme="light"] .project-desc { color:#555; }
+
+        .project-tags { display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.2rem; }
+        .tag { background:var(--tag-bg); color:var(--accent);
+               padding:.3rem .8rem; border-radius:50px; font-size:.8rem; font-weight:500; }
+
+        .project-links a { color:var(--text); font-size:1.3rem; transition:.3s; }
+        .project-links a:hover { color:var(--accent); }
+
         /* Footer */
-        footer {
-            text-align: center;
-            padding: 3rem 5%;
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-            color: #777;
-        }
-        
+        footer { text-align:center; padding:3rem 5%; border-top:1px solid var(--border);
+                 font-size:.9rem; color:#777; }
+        [data-theme="light"] footer { color:#555; }
+
         /* Responsive */
-        @media (max-width: 768px) {
-            nav ul {
-                gap: 1rem;
-            }
-            .hero h1 {
-                font-size: 3.5rem;
-            }
-            section {
-                padding: 6rem 5%;
-            }
+        @media (max-width:768px) {
+            nav ul { gap:1rem; }
+            .hero h1 { font-size:3.5rem; }
+            section { padding:6rem 5%; }
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header>
-        <div class="logo">Portfolio</div>
+        <div class="logo">Lassiweb - Portfolio</div>
         <nav>
             <ul>
                 <li><a href="#home">Home</a></li>
@@ -319,33 +191,33 @@
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </nav>
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" aria-label="Toggle dark/light mode">
+            <i class="ph ph-moon"></i>
+        </button>
     </header>
 
     <!-- Hero -->
     <section id="home" class="hero">
-        <h1>Hi, I'm <span style="background: linear-gradient(135deg, #00d4ff, #7b00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">[Your Name]</span></h1>
+        <h1>Hi, I'm <span style="background:linear-gradient(135deg,var(--accent),#7b00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Lassi</span></h1>
         <p>Crafting digital experiences with code, creativity, and a touch of magic.</p>
-        <button class="cta" onclick="document.getElementById('projects').scrollIntoView({behavior: 'smooth'})">
+        <button class="cta" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">
             View My Work <i class="ph ph-arrow-down"></i>
         </button>
     </section>
 
-    <!-- Projects Section -->
+    <!-- Projects -->
     <section id="projects">
         <h2 class="section-title">Featured Projects</h2>
         <div class="projects-grid">
-            <!-- Project 1 -->
+            <!-- ==== COPY THIS BLOCK FOR NEW PROJECTS ==== -->
             <div class="project-card">
-                <div class="project-img">
-                    <i class="ph ph-code"></i>
-                </div>
+                <div class="project-img"><i class="ph ph-code"></i></div>
                 <div class="project-info">
-                    <h3 class="project-title">Project Title One</h3>
+                    <h3 class="project-title">Modern web app with React</h3>
                     <p class="project-desc">A modern web app built with React and Three.js featuring 3D interactive elements and smooth animations.</p>
                     <div class="project-tags">
-                        <span class="tag">React</span>
-                        <span class="tag">Three.js</span>
-                        <span class="tag">GSAP</span>
+                        <span class="tag">React</span><span class="tag">Three.js</span><span class="tag">GSAP</span>
                     </div>
                     <div class="project-links">
                         <a href="#" title="GitHub"><i class="ph ph-github-logo"></i></a>
@@ -353,8 +225,50 @@
                     </div>
                 </div>
             </div>
+            <!-- ==== END BLOCK ==== -->
 
-            <!-- Project 2 -->
+            <!-- ==== COPY THIS BLOCK FOR NEW PROJECTS ==== -->
+            <div class="project-card">
+                <div class="project-img"><i class="ph ph-code"></i></div>
+                <div class="project-info">
+                    <h3 class="project-title">Responsive admin dashboard</h3>
+                    <p class="project-desc">Responsive admin dashboard with dark mode, real-time charts, and drag-and-drop interface.</p>
+                    <div class="project-tags">
+                        <span class="tag">Vue.js</span>
+                        <span class="tag">Chart.js</span>
+                        <span class="tag">Tailwind</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" title="GitHub"><i class="ph ph-github-logo"></i></a>
+                        <a href="#" title="Live Demo"><i class="ph ph-arrow-up-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- ==== END BLOCK ==== -->
+
+            <!-- ==== COPY THIS BLOCK FOR NEW PROJECTS ==== -->
+            <div class="project-card">
+                <div class="project-img">
+                    <i class="ph ph-device-mobile"></i>
+                </div>
+                <div class="project-info">
+                    <h3 class="project-title">Mobile First App</h3>
+                    <p class="project-desc">Cross-platform mobile app with offline support, push notifications, and beautiful UI.</p>
+                    <div class="project-tags">
+                        <span class="tag">React Native</span>
+                        <span class="tag">Firebase</span>
+                        <span class="tag">Redux</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="#" title="GitHub"><i class="ph ph-github-logo"></i></a>
+                        <a href="#" title="Live Demo"><i class="ph ph-arrow-up-right"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- ==== END BLOCK ==== -->   
+
+            <!-- Duplicate the block above for more projects -->
+                         <!-- Project 2 -->
             <div class="project-card">
                 <div class="project-img">
                     <i class="ph ph-palette"></i>
@@ -393,92 +307,73 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Add more project cards as needed -->
-            <!-- Duplicate the .project-card block and customize -->
         </div>
     </section>
 
-    <!-- Contact Section (Simple) -->
+    <!-- Contact -->
     <section id="contact">
         <h2 class="section-title">Get In Touch</h2>
-        <p style="text-align:center; max-width:700px; margin:0 auto 2rem; font-size:1.1rem; opacity:0; transform:translateY(20px);">
+        <p style="text-align:center;max-width:700px;margin:0 auto 2rem;font-size:1.1rem;opacity:0;transform:translateY(20px);">
             I'm always open to discussing new opportunities, collaborations, or just having a chat about tech and design.
         </p>
-        <div style="text-align:center; opacity:0; transform:translateY(20px);">
-            <a href="mailto:your@email.com" style="color:var(--accent); font-weight:600; text-decoration:none; font-size:1.2rem;">
-                your@email.com <i class="ph ph-envelope" style="margin-left:0.5rem;"></i>
+        <div style="text-align:center;opacity:0;transform:translateY(20px);">
+            <a href="mailto:your@email.com" style="color:var(--accent);font-weight:600;text-decoration:none;font-size:1.2rem;">
+                your@email.com <i class="ph ph-envelope" style="margin-left:.5rem;"></i>
             </a>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 [Your Name]. Built with 💻 and ☕.</p>
-    </footer>
+    <footer><p>&copy; 2025 Lassiweb lassiweb.github.io - Built with love and code.</p></footer>
 
     <script>
-        // GSAP Animations
+        // ---------- THEME TOGGLE ----------
+        const toggleBtn = document.querySelector('.theme-toggle');
+        const icon = toggleBtn.querySelector('i');
+        const html = document.documentElement;
+
+        // Load saved theme
+        const saved = localStorage.getItem('theme');
+        if (saved) html.setAttribute('data-theme', saved);
+        updateIcon();
+
+        toggleBtn.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateIcon();
+        });
+
+        function updateIcon() {
+            const isLight = html.getAttribute('data-theme') === 'light';
+            icon.className = isLight ? 'ph ph-sun' : 'ph ph-moon';
+        }
+
+        // ---------- GSAP ANIMATIONS ----------
         gsap.registerPlugin(ScrollTrigger);
 
-        // Hero animations
         gsap.timeline()
-            .to(".hero h1", { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, 0.3)
-            .to(".hero p", { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, 0.5)
-            .to(".cta", { opacity: 1, y: 0, duration: 1, ease: "power3.out" }, 0.7);
+            .to(".hero h1", {opacity:1, y:0, duration:1, ease:"power3.out"}, .3)
+            .to(".hero p", {opacity:1, y:0, duration:1, ease:"power3.out"}, .5)
+            .to(".cta", {opacity:1, y:0, duration:1, ease:"power3.out"}, .7);
 
-        // Section title
-        gsap.to(".section-title", {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            ease: "power3.out",
-            scrollTrigger: {
-                trigger: ".section-title",
-                start: "top 80%"
-            }
+        gsap.to(".section-title", {opacity:1, y:0, duration:1, ease:"power3.out",
+            scrollTrigger:{trigger:".section-title", start:"top 80%"}});
+
+        gsap.utils.toArray(".project-card").forEach(card => {
+            gsap.to(card, {opacity:1, y:0, duration:.8, ease:"power3.out",
+                scrollTrigger:{trigger:card, start:"top 85%", toggleActions:"play none none reverse"}});
         });
 
-        // Project cards stagger animation
-        gsap.utils.toArray(".project-card").forEach((card, i) => {
-            gsap.to(card, {
-                opacity: 1,
-                y: 0,
-                duration: 0.8,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    toggleActions: "play none none reverse"
-                }
-            });
+        gsap.utils.toArray("#contact p, #contact div").forEach((el,i) => {
+            gsap.to(el, {opacity:1, y:0, duration:1, delay:i*.2,
+                scrollTrigger:{trigger:el, start:"top 90%"}});
         });
 
-        // Contact text
-        gsap.utils.toArray("#contact p, #contact div").forEach((el, i) => {
-            gsap.to(el, {
-                opacity: 1,
-                y: 0,
-                duration: 1,
-                delay: i * 0.2,
-                scrollTrigger: {
-                    trigger: el,
-                    start: "top 90%"
-                }
-            });
-        });
-
-        // Parallax effect on hero background (subtle)
-        gsap.to(".hero::before", {
-            backgroundPosition: "50% 50%",
-            ease: "none",
-            scrollTrigger: {
-                trigger: ".hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
+        // subtle parallax on hero background
+        gsap.to(".hero::before", {backgroundPosition:"50% 50%", ease:"none",
+            scrollTrigger:{trigger:".hero", start:"top top", end:"bottom top", scrub:true}});
     </script>
 </body>
 </html>
